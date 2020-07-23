@@ -13,6 +13,7 @@ namespace VktestAPP
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
             // //Вход как человек
@@ -32,48 +33,61 @@ namespace VktestAPP
 
             long idbot = 197334937;
             var dictSubs = new Dictionary<long, string>();
+            bool corInputToken = false;
 
-
-            try
+            while(!corInputToken)
             {
-                bot.Authorize(new ApiAuthParams
+                Console.Write("Input token:");
+                string token = Console.ReadLine();
+                try
                 {
-                    AccessToken = ""
-                });
-
-                Console.WriteLine($"Bot connected with id:{idbot}");
-
-                var listSubs = bot.Groups.GetMembers(new GroupsGetMembersParams { GroupId = idbot.ToString() });
-                var listIdSubs = new List<long>();
-
-                foreach (var sub in listSubs)
-                {
-                    listIdSubs.Add(sub.Id);
+                    bot.Authorize(new ApiAuthParams
+                    {
+                        AccessToken = token
+                    });
+                    var t = bot.Utils.CheckLink("https://yandex.ru/");
+                    corInputToken = true;
                 }
-                //listIdSubs.Remove(Me.UserId.Value);
-
-                var listSubsU = bot.Users.Get(listIdSubs);
-
-                // Словарь подписчиков ключ - id, значение - Имя Фамилия
-
-                foreach (var sub in listSubsU)
+                catch (Exception e)
                 {
-                    dictSubs.Add(sub.Id, sub.FirstName + " " + sub.LastName);
+                    Console.WriteLine($"[Error] {e.Message}");
+                    corInputToken = false;
                 }
-                //dictSubs.Remove(Me.UserId.Value);
 
-                //Вывод в консоль 
-                Console.WriteLine("Subscribers of the group:");
-                foreach (var sub in dictSubs)
-                {
-                    Console.WriteLine($"id:{sub.Key}| {sub.Value}");
-                }
-                Console.WriteLine("<-------------------------->");
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"[Error] {e.Message}");
-            }
+            Console.Clear();
+
+            
+
+            Console.WriteLine($"Bot connected with id:{idbot}");
+
+           var listSubs = bot.Groups.GetMembers(new GroupsGetMembersParams { GroupId = idbot.ToString() });
+           var listIdSubs = new List<long>();
+
+           foreach (var sub in listSubs)
+           {
+                listIdSubs.Add(sub.Id);
+           }
+                
+
+           var listSubsU = bot.Users.Get(listIdSubs);
+
+           // Словарь подписчиков ключ - id, значение - Имя Фамилия
+
+           foreach (var sub in listSubsU)
+           {
+                dictSubs.Add(sub.Id, sub.FirstName + " " + sub.LastName);
+           }
+           //dictSubs.Remove(Me.UserId.Value);
+
+           //Вывод в консоль 
+           Console.WriteLine("Subscribers of the group:");
+           foreach (var sub in dictSubs)
+           {
+                Console.WriteLine($"id:{sub.Key}| {sub.Value}");
+           }
+           Console.WriteLine("<-------------------------->");
+            
 
 
 
@@ -90,6 +104,7 @@ namespace VktestAPP
             }
             catch (Exception e)
             {
+                Console.WriteLine("Failed to write subscribers to the subs.txt");
                 Console.WriteLine($"[Error] {e.Message}");
             }
 
@@ -119,6 +134,9 @@ namespace VktestAPP
                     }
                 }
             } while (message != "/exit");
+
+           
+
             Console.WriteLine("Press enter to exit program...");
 
             Console.ReadLine();
